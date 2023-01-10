@@ -41,10 +41,28 @@ def test():
 
     # test loan summary
     month = 360
-    loan_summary_response = client.get('/loan_summary/%d/%d' % (loan_id, month))
+    loan_summary_response = client.get(
+        '/loan_summary/%d/%d' % (loan_id, month))
     assert loan_summary_response.status_code == 200
     assert loan_summary_response.json() == {
         "principal_payment": 2982.84,
         "total_principal_payment": 499999.93,
         "total_interest_payment": 579190.97
     }
+
+    # test create another user
+    create_user2_response = client.post('/users', json={'name': 'testuser2'})
+    assert create_user2_response.status_code == 200
+
+    user2_id = create_user2_response.json()['id']
+
+    # test loan share
+    loan_share_response = client.post('/loan_share', json={
+        "source_user_id": user_id,
+        "target_user_id": user2_id,
+        "loan_id": loan_id
+    })
+    assert loan_share_response.status_code == 200
+
+    loan = loan_share_response.json()
+    assert loan['user_id'] == user2_id
