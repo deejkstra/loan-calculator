@@ -4,6 +4,7 @@ from app import app
 
 client = TestClient(app)
 
+
 def test():
     # test create user
     create_user_response = client.post('/users', json={'name': 'testuser'})
@@ -40,7 +41,7 @@ def test():
 
     # test loan summary
     month = 360
-    loan_summary_response = client.get('/loan_summary/%d/%d' % (loan_id, 360))
+    loan_summary_response = client.get('/loan_summary/%d/%d' % (loan_id, month))
     assert loan_summary_response.status_code == 200
     assert loan_summary_response.json() == {
         "principal_payment": 2982.84,
