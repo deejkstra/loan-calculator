@@ -1,9 +1,9 @@
 from typing import List
 
 import decimal
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from sqlmodel import SQLModel, Session, select, create_engine
-from models import User, Loan, LoanSchedule, LoanSummary
+from models import User, Loan, LoanSchedule, LoanSummary, Share
 from utils import _get_loan_schedule
 
 
@@ -89,6 +89,14 @@ def get_loan_summary(loan_id: int, month: int):
         )
 
 
-@app.post('/loan_share/{user1_id}/{user2_id}')
-def share_loan(user1_id: int, user2_id: int):
-    pass
+@app.post('/loan_share', response_model=Loan)
+def share_loan(data: Share):
+    with Session(engine) as session:
+        loan = session.get(Loan, data.loan_id)
+        if not loan.user_id == data.source_user_id:
+            raise HTTPException(status_code=404, detail="Item not found")
+        loan.user_id = data.target_user_id
+        session.add(loan)
+        session.commit()
+        session.refresh(loan)
+        return loan

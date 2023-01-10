@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import condecimal
+from pydantic import condecimal, BaseModel
 from sqlmodel import Field, SQLModel
 
 
@@ -33,3 +33,9 @@ class LoanSummary(SQLModel):
         max_digits=16, decimal_places=2) = Field(default=0)
     total_interest_payment: condecimal(
         max_digits=16, decimal_places=2) = Field(default=0)
+
+
+class Share(BaseModel):
+    source_user_id: int
+    target_user_id: int
+    loan_id: int
